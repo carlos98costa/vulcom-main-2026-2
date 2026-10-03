@@ -10,7 +10,7 @@ const app = express()
 // Permite o consumo da API pelo Vite durante o desenvolvimento.
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ?.split(',')
-  .map(origin => origin.trim())
+  .map(origin => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean) ?? []
 
 app.use((req, res, next) => {

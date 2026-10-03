@@ -18,7 +18,7 @@ class HttpError extends Error {
 const myfetch = {}  // Objeto vazio
 
 // Lê o endereço do back-end a partir do arquivo .env.local
-const baseUrl = import.meta.env.VITE_API_BASE
+const baseUrl = import.meta.env.VITE_API_BASE.replace(/\/+$/, '')
 
 function getOptions(body = null, method = 'GET') {
   const options = {
