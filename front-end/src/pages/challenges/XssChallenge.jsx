@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import myfetch from '../../lib/myfetch'
+import DOMPurify from 'dompurify'
 
 export default function XssChallenge() {
   const [content, setContent] = React.useState('')
@@ -63,9 +64,18 @@ export default function XssChallenge() {
       <Typography variant="h2" sx={{ fontSize: '1.5rem' }}>Comentários</Typography>
       {/* OWASP Top 10:2025 A05 - Injeção (XSS armazenado):
           dangerouslySetInnerHTML interpreta o comentário como HTML sem escape ou sanitização. */}
-      {comments.map(comment => (
-        <div key={comment.id} dangerouslySetInnerHTML={{ __html: `<p>${comment.content}</p>` }} />
-      ))}
+      {comments.map(comment => {
+        // 2. SANITIZAR O CONTEÚDO BRUTO DO COMENTÁRIO
+        const cleanContent = DOMPurify.sanitize(comment.content)
+
+        return (
+          <div 
+            key={comment.id} 
+            // 3. INJETAR A STRING PURIFICADA DENTRO DA TAG <p>
+            dangerouslySetInnerHTML={{ __html: `<p>${cleanContent}</p>` }} 
+          />
+        )
+      })}
     </Paper>
   </Stack>
 }
