@@ -1,6 +1,8 @@
+import 'dotenv/config'
 import { faker } from '@faker-js/faker/locale/pt_BR'
 import { PrismaClient } from '@prisma/client'
 import { hashPassword } from '../src/lib/passwords.js'
+import { randomBytes } from 'node:crypto'
 
 const prisma = new PrismaClient();
 
@@ -21,6 +23,11 @@ const colors = [
 ]
 
 async function main() {
+  const adminPassword = process.env.ADMIN_PASSWORD
+  if (!adminPassword) {
+    throw new Error('Defina ADMIN_PASSWORD no ambiente antes de executar o seed.')
+  }
+
   // Comentário inicial do desafio de XSS
   await prisma.xssComment.create({
     data: { content: 'Bem-vindo ao desafio de XSS!' }
@@ -35,12 +42,14 @@ async function main() {
     where: {
       email: 'admin@vulcom.com.br'
     },
-    update: {},
+    update: {
+      password: await hashPassword(adminPassword)
+    },
     create: {
       fullname: 'Administrador do Sistema',
       username: 'admin',
       email: 'admin@vulcom.com.br',
-      password: await hashPassword('Vulcom@DSM'),
+      password: await hashPassword(adminPassword),
       is_admin: true
     }
   })
@@ -53,8 +62,8 @@ async function main() {
         fullname: faker.person.fullName(),
         username: faker.internet.username(),
         email: faker.internet.email(),
-        password: await hashPassword('senha123'),
-        is_admin: i === 0,
+        password: await hashPassword(randomBytes(32).toString('hex')),
+        is_admin: false,
       },
     });
     users.push(user);
