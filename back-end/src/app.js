@@ -13,6 +13,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ?.split(',')
   .map(origin => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean) ?? []
+  credentials:true
 
 app.use((req, res, next) => {
   const origin = req.headers.origin
