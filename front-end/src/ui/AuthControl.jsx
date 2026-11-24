@@ -24,13 +24,27 @@ export default function AuthControl() {
       // OWASP Top 10:2025 A07 - Falhas de Autenticação:
       // o logout só remove a cópia local; não revoga o JWT nem encerra o cookie no servidor.
       // Apaga o token do localStorage
-      window.localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_NAME)
+      //window.localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_NAME)
 
-      // Remove as informações do usuário autenticado
-      setAuthUser(null)
+      showWaiting(true)
+      try {
+        // Faz requisição para o back-end solicitando a exclusão do
+        // cookie contendo o token JWT
+        await myfetch.post('/users/logout')
 
-      // Redireciona para a página de login
-      navigate('/login')
+        // Remove as informações do usuário autenticado
+        setAuthUser(null)
+
+        // Redireciona para a página de login
+        navigate('/login')
+      }
+      catch(error) {
+        console.error(error)
+        notify(error.message, 'error')
+      }
+      finally {
+        showWaiting(false)
+      }
     }
   }
 

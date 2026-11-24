@@ -3,6 +3,7 @@ import Typography from '@mui/material/Typography'
 
 export default function Homepage() {
   const [entries, setEntries] = React.useState([])
+  const [cookies, setCookies] = React.useState([])
 
   React.useEffect(() => {
     const data = Object.keys(localStorage).map(key => ({
@@ -10,6 +11,19 @@ export default function Homepage() {
       value: localStorage.getItem(key)
     }))
     setEntries(data)
+
+    const cookieData = document.cookie
+      .split(';')
+      .map(item => item.trim())
+      .filter(Boolean)
+      .map(item => {
+        const index = item.indexOf('=')
+        return {
+          key: index >= 0 ? item.slice(0, index) : item,
+          value: index >= 0 ? item.slice(index + 1) : ''
+        }
+      })
+    setCookies(cookieData)
   }, [])
 
   return(
@@ -40,6 +54,34 @@ export default function Homepage() {
                 sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
               >
                 {entry.value}
+              </Typography>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Typography variant="h2" gutterBottom sx={{ mt: 4 }}>
+        Cookies encontrados
+      </Typography>
+      <Typography>
+        Cookies acessíveis nesta página via document.cookie. Cookies HttpOnly
+        não podem ser lidos pelo JavaScript.
+      </Typography>
+
+      {cookies.length === 0 ? (
+        <Typography>Nenhum cookie encontrado.</Typography>
+      ) : (
+        <ul>
+          {cookies.map(cookie => (
+            <li key={`${cookie.key}=${cookie.value}`}>
+              <Typography component="div">
+                <strong>Nome:</strong> {cookie.key}
+              </Typography>
+              <Typography
+                component="pre"
+                sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}
+              >
+                {cookie.value}
               </Typography>
             </li>
           ))}
